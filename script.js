@@ -8,6 +8,91 @@
   const yearEl = document.getElementById('year');
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
+  /* ───────── i18n ───────── */
+  const I18N = window.I18N || {};
+  const SUPPORTED = ['en', 'ru', 'uz'];
+  const STORE_KEY = 'hs_lang';
+
+  const getByPath = (obj, path) =>
+    path.split('.').reduce((o, k) => (o == null ? undefined : o[k]), obj);
+
+  const detectLang = () => {
+    try {
+      const saved = localStorage.getItem(STORE_KEY);
+      if (saved && SUPPORTED.includes(saved)) return saved;
+    } catch (_) {}
+    const nav = (navigator.language || navigator.userLanguage || 'en').toLowerCase();
+    if (nav.startsWith('ru')) return 'ru';
+    if (nav.startsWith('uz')) return 'uz';
+    return 'en';
+  };
+
+  const renderStackLists = (lang) => {
+    const dict = I18N[lang] && I18N[lang].stack;
+    if (!dict) return;
+    document.querySelectorAll('[data-stack-col]').forEach(col => {
+      const key = col.dataset.stackCol;
+      const data = dict[key];
+      if (!data) return;
+      const labelEl = col.querySelector('.stack__label');
+      if (labelEl && data.label) labelEl.textContent = data.label;
+      const ulEl = col.querySelector('ul');
+      if (ulEl && Array.isArray(data.items)) {
+        ulEl.innerHTML = data.items.map(t => `<li>${t}</li>`).join('');
+      }
+    });
+  };
+
+  const applyLang = (lang) => {
+    if (!SUPPORTED.includes(lang)) lang = 'en';
+    const dict = I18N[lang];
+    if (!dict) return;
+    document.documentElement.lang = lang;
+
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const val = getByPath(dict, el.dataset.i18n);
+      if (val != null) el.innerHTML = val;
+    });
+
+    document.querySelectorAll('[data-i18n-attr]').forEach(el => {
+      const pairs = el.dataset.i18nAttr.split(';');
+      pairs.forEach(pair => {
+        const [attr, key] = pair.split(':').map(s => s && s.trim());
+        if (!attr || !key) return;
+        const val = getByPath(dict, key);
+        if (val != null) el.setAttribute(attr, val);
+      });
+    });
+
+    renderStackLists(lang);
+
+    document.querySelectorAll('.lang__btn').forEach(b => {
+      b.classList.toggle('is-active', b.dataset.lang === lang);
+      b.setAttribute('aria-pressed', String(b.dataset.lang === lang));
+    });
+    moveLangIndicator();
+
+    try { localStorage.setItem(STORE_KEY, lang); } catch (_) {}
+  };
+
+  const moveLangIndicator = () => {
+    const ind = document.querySelector('.lang__indicator');
+    const active = document.querySelector('.lang__btn.is-active');
+    if (!ind || !active) return;
+    ind.style.width = `${active.offsetWidth}px`;
+    ind.style.transform = `translateX(${active.offsetLeft - 3}px)`;
+  };
+
+  document.querySelectorAll('.lang__btn').forEach(btn => {
+    btn.addEventListener('click', () => applyLang(btn.dataset.lang));
+  });
+  window.addEventListener('resize', moveLangIndicator);
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(moveLangIndicator).catch(() => {});
+  }
+
+  applyLang(detectLang());
+
   /* ───────── Nav scroll state ───────── */
   const nav = document.getElementById('nav');
   const onScroll = () => {
@@ -24,7 +109,6 @@
       const open = nav.classList.toggle('is-open');
       menuBtn.setAttribute('aria-expanded', String(open));
     });
-    // close on link click
     nav.querySelectorAll('.nav__links a, .nav__cta').forEach(a => {
       a.addEventListener('click', () => {
         nav.classList.remove('is-open');
