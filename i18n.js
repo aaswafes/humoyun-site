@@ -119,7 +119,7 @@ window.I18N = {
       title: 'Got a workflow you\'re <span class="grad">tired of doing</span>?',
       sub: "Tell me what's broken, slow, or expensive. I'll write back fast — usually with a quick sketch of how I'd fix it.",
       tg: "Telegram",
-      gh: "GitHub",
+      ig: "Instagram",
       big: "Say hi →"
     },
     footer: {
@@ -245,7 +245,7 @@ window.I18N = {
       title: 'Есть процесс, от которого <span class="grad">вы устали</span>?',
       sub: "Расскажите, что у вас сломано, медленно или дорого. Отвечу быстро — обычно с наброском, как я бы это починил.",
       tg: "Telegram",
-      gh: "GitHub",
+      ig: "Instagram",
       big: "Напишите →"
     },
     footer: {
@@ -371,7 +371,7 @@ window.I18N = {
       title: '<span class="grad">Charchatgan</span> bir jarayon bormi?',
       sub: "Nima buzilgan, sekin yoki qimmat ekanini ayting. Tez javob qaytaraman — odatda men buni qanday tuzatishim haqida qisqacha eskiz bilan.",
       tg: "Telegram",
-      gh: "GitHub",
+      ig: "Instagram",
       big: "Salom yozing →"
     },
     footer: {

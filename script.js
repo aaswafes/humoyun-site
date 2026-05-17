@@ -163,13 +163,14 @@
       entries.forEach(en => {
         if (!en.isIntersecting) return;
         const el = en.target;
-        const target = parseInt(el.dataset.count, 10) || 0;
+        const target = parseFloat(el.dataset.count) || 0;
+        const decimals = Number.isInteger(target) ? 0 : 1;
         const dur = 1100;
         const start = performance.now();
         const tick = (t) => {
           const p = Math.min(1, (t - start) / dur);
           const eased = 1 - Math.pow(1 - p, 3);
-          el.textContent = Math.round(target * eased).toString();
+          el.textContent = (target * eased).toFixed(decimals);
           if (p < 1) requestAnimationFrame(tick);
         };
         requestAnimationFrame(tick);
